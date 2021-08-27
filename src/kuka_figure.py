@@ -199,3 +199,76 @@ axs[2].text(np.radians(label_position-30),axs[2].get_rmax()/2.,'Distance (m)',
         rotation=label_position,ha='center',va='center')
 
 f.savefig(os.path.join('..', 'figures', 'kuka_figure.png'), transparent=True)
+
+# %% Plot counts
+
+hmin = 0
+hmax = 10
+
+cmap_div = copy.copy(cm.get_cmap('RdBu_r'))
+cmap_div.set_bad(color='black')
+cmap_seq = copy.copy(cm.get_cmap('rainbow'))
+cmap_seq.set_bad(color='black')
+
+f, axs = plt.subplots(1, 3, figsize=(15,5), 
+                      subplot_kw=dict(projection='polar'))
+
+h = axs[0].pcolormesh(t_edges, r_edges, 
+              pol_cts['mosaic_01_110119.RiSCAN'],
+              cmap=cmap_seq, vmin=hmin, vmax=hmax)
+
+f.colorbar(h, ax=axs[0], shrink=0.8, label='Height (m)')
+axs[0].set_xlim([-np.pi/3, np.pi/3])
+axs[0].set_title('Topography Nov. 1')
+label_position=-60
+axs[0].text(np.radians(label_position-30),axs[0].get_rmax()/2.,'Distance (m)',
+        rotation=label_position,ha='center',va='center')
+h = axs[1].pcolormesh(t_edges, r_edges, 
+              pol_cts['mosaic_01_111519.RiSCAN'],
+              cmap=cmap_seq, vmin=hmin, vmax=hmax)
+
+f.colorbar(h, ax=axs[1], shrink=0.8, label='Height (m)')
+axs[1].set_xlim([-np.pi/3, np.pi/3])
+axs[1].set_title('Topography Nov. 15')
+axs[1].text(np.radians(label_position-30),axs[1].get_rmax()/2.,'Distance (m)',
+        rotation=label_position,ha='center',va='center')
+
+h = axs[2].pcolormesh(t_edges, r_edges, 
+              pol_cts['mosaic_01_111519.RiSCAN']
+              -pol_cts['mosaic_01_110119.RiSCAN'],
+              vmin=-.2, vmax=.2, cmap=cmap_div)
+
+f.colorbar(h, ax=axs[2], shrink=0.8, label='Change (m)')
+axs[2].set_xlim([-np.pi/3, np.pi/3])
+axs[2].set_title('Difference')
+axs[2].text(np.radians(label_position-30),axs[2].get_rmax()/2.,'Distance (m)',
+        rotation=label_position,ha='center',va='center')
+
+# %% Plot along specific lines
+
+r_ctr = (r_edges[:-1] + r_edges[1:])/2
+t_ctr = (t_edges[:-1] + t_edges[1:])/2
+
+t_ind = -13
+r_ind = 4
+
+f, axs = plt.subplots(1, 2, sharey=True, figsize=(10, 5))
+
+axs[0].plot(r_ctr, pol_mean['mosaic_01_110119.RiSCAN'][:, t_ind], 'o',
+            label='Nov. 01')
+axs[0].plot(r_ctr, pol_mean['mosaic_01_111519.RiSCAN'][:, t_ind], 'o',
+            label='Nov. 15')
+
+axs[1].plot(t_ctr, pol_mean['mosaic_01_110119.RiSCAN'][r_ind, :], 'o',
+            label='Nov. 01')
+axs[1].plot(t_ctr, pol_mean['mosaic_01_111519.RiSCAN'][r_ind, :], 'o',
+            label='Nov. 15')
+axs[1].set_xlim([-np.pi/3, np.pi/3])
+axs[0].set_ylim([-1.55, -1.35])
+
+axs[0].legend()
+
+axs[0].set_ylabel('Surface Height (m)')
+axs[0].set_xlabel('Distance from Pedestal (m)')
+axs[1].set_xlabel('Angle (radians)')
+
